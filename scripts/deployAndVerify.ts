@@ -15,55 +15,27 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const fooTokenContractName: string = 'FooToken';
-  const fooTokenConstructorArgs: Array<
-    string | number | Array<string | number>
-  > = ['100000000000000'];
-  const fooTokenFactory: ContractFactory = await ethers.getContractFactory(
-    fooTokenContractName
+  const vickreyAuctionContractName: string = 'VickreyAuction';
+  const vickreyAuctionFactory: ContractFactory =
+    await ethers.getContractFactory(vickreyAuctionContractName);
+  const vickreyAuction: Contract = await vickreyAuctionFactory.deploy();
+  await vickreyAuction.deployed();
+  console.log(
+    vickreyAuctionContractName + ' deployed to:',
+    vickreyAuction.address
   );
-  const fooToken: Contract = await fooTokenFactory.deploy(
-    ...fooTokenConstructorArgs
-  );
-  await fooToken.deployed();
-  console.log(fooTokenContractName + ' deployed to:', fooToken.address);
-
-  const workshopContractName: string = 'Workshop';
-  const workshopConstructorArgs: Array<
-    string | number | Array<string | number>
-  > = [fooToken.address];
-  const workshopFactory: ContractFactory = await ethers.getContractFactory(
-    workshopContractName
-  );
-  const workshop: Contract = await workshopFactory.deploy(
-    ...workshopConstructorArgs
-  );
-  await workshop.deployed();
-  console.log(workshopContractName + ' deployed to:', workshop.address);
 
   await setTimeout(async () => {
     // verify contracts on explorer
     await run('verify:verify', {
-      address: fooToken.address,
-      constructorArguments: fooTokenConstructorArgs,
-    });
-
-    await run('verify:verify', {
-      address: workshop.address,
-      constructorArguments: workshopConstructorArgs,
+      address: vickreyAuction.address,
     });
 
     // send notice to tenderly for contracts
-    await tenderly.verify(
-      {
-        name: fooTokenContractName,
-        address: fooToken.address,
-      },
-      {
-        name: workshopContractName,
-        address: workshop.address,
-      }
-    );
+    await tenderly.verify({
+      name: vickreyAuctionContractName,
+      address: vickreyAuction.address,
+    });
   }, 1000 * 60); // 60 secs
 }
 

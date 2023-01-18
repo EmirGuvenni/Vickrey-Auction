@@ -15,42 +15,17 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const fooTokenName: string = 'FooToken';
-  const fooTokenConstructorArgs: Array<
-    string | number | Array<string | number>
-  > = ['100000000000000'];
-  const fooTokenFactory: ContractFactory = await ethers.getContractFactory(
-    fooTokenName
-  );
-  const fooToken: Contract = await fooTokenFactory.deploy(
-    ...fooTokenConstructorArgs
-  );
-  await fooToken.deployed();
-  console.log(fooTokenName + ' deployed to:', fooToken.address);
+  const vickreyAuctionName: string = 'VickreyAuction';
+  const vickreyAuctionFactory: ContractFactory =
+    await ethers.getContractFactory(vickreyAuctionName);
+  const vickreyAuction: Contract = await vickreyAuctionFactory.deploy();
+  await vickreyAuction.deployed();
+  console.log(vickreyAuctionName + ' deployed to:', vickreyAuction.address);
 
-  const workshopName: string = 'Workshop';
-  const workshopConstructorArgs: Array<
-    string | number | Array<string | number>
-  > = [fooToken.address];
-  const workshopFactory: ContractFactory = await ethers.getContractFactory(
-    workshopName
-  );
-  const workshop: Contract = await workshopFactory.deploy(
-    ...workshopConstructorArgs
-  );
-  await workshop.deployed();
-  console.log(workshopName + ' deployed to:', workshop.address);
-
-  await tenderly.verify(
-    {
-      name: fooTokenName,
-      address: fooToken.address,
-    },
-    {
-      name: workshopName,
-      address: workshop.address,
-    }
-  );
+  await tenderly.verify({
+    name: vickreyAuctionName,
+    address: vickreyAuction.address,
+  });
 }
 
 // We recommend this pattern to be able to use async/await everywhere
