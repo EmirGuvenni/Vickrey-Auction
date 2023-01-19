@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title Vickrey Auction
+ * cspell:disable-next-line
  * @author Emir Güvenni
  */
 contract VickreyAuction is Context {
@@ -132,9 +133,7 @@ contract VickreyAuction is Context {
         _;
     }
 
-    function getAuction(
-        uint256 auctionId
-    )
+    function getAuction(uint256 auctionId)
         public
         view
         returns (
@@ -165,7 +164,11 @@ contract VickreyAuction is Context {
         );
     }
 
-    function createAuction(string memory name, uint256 startsAt, uint256 endsAt) external payable {
+    function createAuction(
+        string memory name,
+        uint256 startsAt,
+        uint256 endsAt
+    ) external payable {
         require(bytes(name).length >= MIN_AUCTION_NAME_LEN, "Name is too short");
         require(bytes(name).length <= MAX_AUCTION_NAME_LEN, "Name is too long");
 
@@ -191,10 +194,12 @@ contract VickreyAuction is Context {
         emit NewAuction(auctionId, _msgSender(), startsAt, endsAt);
     }
 
-    function addItem(
-        uint256 auctionId,
-        string memory description
-    ) external onlyCreator(auctionId) mustBeNotStarted(auctionId) mustBeNotEnded(auctionId) {
+    function addItem(uint256 auctionId, string memory description)
+        external
+        onlyCreator(auctionId)
+        mustBeNotStarted(auctionId)
+        mustBeNotEnded(auctionId)
+    {
         Auction storage auction = _auctions[auctionId];
         Item storage item = auction.items[auction.itemCounter.current()];
         auction.itemCounter.increment();
@@ -202,10 +207,12 @@ contract VickreyAuction is Context {
         item.description = description;
     }
 
-    function removeItem(
-        uint256 auctionId,
-        uint256 itemId
-    ) external onlyCreator(auctionId) mustBeNotStarted(auctionId) mustBeNotEnded(auctionId) {
+    function removeItem(uint256 auctionId, uint256 itemId)
+        external
+        onlyCreator(auctionId)
+        mustBeNotStarted(auctionId)
+        mustBeNotEnded(auctionId)
+    {
         delete _auctions[auctionId].items[itemId];
     }
 
@@ -220,10 +227,13 @@ contract VickreyAuction is Context {
         auction.participants[sender] = Participant({ hasWithdrawn: false, isParticipant: true });
     }
 
-    function placeBid(
-        uint256 auctionId,
-        uint256 itemId
-    ) external payable onlyParticipant mustBeStarted(auctionId) mustBeNotEnded(auctionId) {
+    function placeBid(uint256 auctionId, uint256 itemId)
+        external
+        payable
+        onlyParticipant
+        mustBeStarted(auctionId)
+        mustBeNotEnded(auctionId)
+    {
         address bidder = _msgSender();
         Auction storage auction = _auctions[auctionId];
 
