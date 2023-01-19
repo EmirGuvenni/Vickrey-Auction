@@ -72,6 +72,12 @@ contract VickreyAuction is Context {
 
     /**
      * @param auctionId The id of the auction
+     * @param participant The address of the participant
+     */
+    event NewParticipant(uint256 indexed auctionId, address indexed participant);
+
+    /**
+     * @param auctionId The id of the auction
      * @param oldName The old name of the item
      * @param newName The new name of the item
      */
