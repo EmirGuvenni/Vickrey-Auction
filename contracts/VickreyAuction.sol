@@ -132,6 +132,39 @@ contract VickreyAuction is Context {
         _;
     }
 
+    function getAuction(
+        uint256 auctionId
+    )
+        public
+        view
+        returns (
+            string memory name,
+            address creator,
+            uint256 startsAt,
+            uint256 endsAt,
+            bool isConcluded,
+            uint256 itemCounter,
+            string[] memory
+        )
+    {
+        Auction storage auction = _auctions[auctionId];
+        string[] memory items;
+
+        for (uint256 i = 0; i < auction.itemCounter.current(); i++) {
+            items[i] = auction.items[i].description;
+        }
+
+        return (
+            auction.name,
+            auction.creator,
+            auction.startsAt,
+            auction.endsAt,
+            auction.isConcluded,
+            auction.itemCounter.current(),
+            items
+        );
+    }
+
     function createAuction(string memory name, uint256 startsAt, uint256 endsAt) external payable {
         require(bytes(name).length >= MIN_AUCTION_NAME_LEN, "Name is too short");
         require(bytes(name).length <= MAX_AUCTION_NAME_LEN, "Name is too long");
