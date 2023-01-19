@@ -162,9 +162,11 @@ contract VickreyAuction is Context {
         uint256 auctionId,
         string memory description
     ) external onlyCreator(auctionId) mustBeNotStarted(auctionId) mustBeNotEnded(auctionId) {
-        Item memory item = Item({ description: description, bids: new Bid[](0), winner: address(0) });
-        _auctions[auctionId].items[_auctions[auctionId].itemCounter.current()] = item;
-        _auctions[auctionId].itemCounter.increment();
+        Auction storage auction = _auctions[auctionId];
+        Item storage item = auction.items[auction.itemCounter.current()];
+        auction.itemCounter.increment();
+
+        item.description = description;
     }
 
     function removeItem(
