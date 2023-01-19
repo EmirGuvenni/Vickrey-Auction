@@ -48,10 +48,9 @@ contract VickreyAuction is Context {
 
     struct Auction {
         string name;
-        mapping(uint256 => Item) items;
+        Item[] items;
         mapping(address => Participant) participants;
         address payable creator;
-        Counters.Counter itemCounter;
         uint256 startsAt;
         uint256 endsAt;
         bool isConcluded;
@@ -148,26 +147,17 @@ contract VickreyAuction is Context {
             uint256 startsAt,
             uint256 endsAt,
             bool isConcluded,
-            uint256 itemCounter,
             string[] memory
         )
     {
         Auction storage auction = _auctions[auctionId];
         string[] memory items;
 
-        for (uint256 i = 0; i < auction.itemCounter.current(); i++) {
+        for (uint256 i = 0; i < auction.items.length; i++) {
             items[i] = auction.items[i].description;
         }
 
-        return (
-            auction.name,
-            auction.creator,
-            auction.startsAt,
-            auction.endsAt,
-            auction.isConcluded,
-            auction.itemCounter.current(),
-            items
-        );
+        return (auction.name, auction.creator, auction.startsAt, auction.endsAt, auction.isConcluded, items);
     }
 
     function createAuction(
@@ -207,9 +197,7 @@ contract VickreyAuction is Context {
         mustBeNotEnded(auctionId)
     {
         Auction storage auction = _auctions[auctionId];
-        Item storage item = auction.items[auction.itemCounter.current()];
-        auction.itemCounter.increment();
-
+        Item storage item = auction.items[auction.items.length];
         item.description = description;
     }
 
@@ -243,9 +231,11 @@ contract VickreyAuction is Context {
         address bidder = _msgSender();
         Auction storage auction = _auctions[auctionId];
 
-        Bid memory bid = Bid({ amount: msg.value, from: bidder, itemId: itemId, amountToBePaid: 0, isWinner: false });
+        Bid storage bid = auction.items[itemId].bids[auction.items[itemId].bids.length];
 
-        auction.items[itemId].bids.push(bid);
+        bid.from = bidder;
+        bid.amount = msg.value;
+        bid.itemId = itemId;
     }
 
     function concludeAuction(uint256 auctionId) external onlyOwner mustBeEnded(auctionId) {
@@ -254,7 +244,7 @@ contract VickreyAuction is Context {
 
         require(!auction.isConcluded, "Auction already concluded");
 
-        for (uint256 i = 0; i < auction.itemCounter.current(); i++) {
+        for (uint256 i = 0; i < auction.items.length; i++) {
             Item storage item = auction.items[i];
 
             if (item.bids.length == 0) continue;
@@ -290,11 +280,11 @@ contract VickreyAuction is Context {
 
         require(!participant.hasWithdrawn, "Already withdrawn");
 
-        for (uint256 i = 0; i < auction.itemCounter.current(); i++) {
-            Item memory item = auction.items[i];
+        for (uint256 i = 0; i < auction.items.length; i++) {
+            Item storage item = auction.items[i];
 
             for (uint256 j = 0; j < item.bids.length; j++) {
-                Bid memory bid = item.bids[j];
+                Bid storage bid = item.bids[j];
 
                 if (bid.from != sender) continue;
 
