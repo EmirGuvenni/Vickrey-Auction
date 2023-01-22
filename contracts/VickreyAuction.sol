@@ -194,8 +194,13 @@ contract VickreyAuction is Context {
         mustBeNotEnded(auctionId)
     {
         Auction storage auction = _auctions[auctionId];
-        Item storage item = auction.items[auction.items.length];
-        item.description = description;
+
+        auction.items.push();
+        auction.items[auction.items.length - 1].description = description;
+        auction.items[auction.items.length - 1].bids.push();
+        auction.items[auction.items.length - 1].bids[0].from = auction.creator;
+
+        emit AddedItem(auctionId, description);
     }
 
     function removeItem(uint256 auctionId, uint256 itemId)
@@ -205,7 +210,13 @@ contract VickreyAuction is Context {
         mustBeNotStarted(auctionId)
         mustBeNotEnded(auctionId)
     {
-        delete _auctions[auctionId].items[itemId];
+        Auction storage auction = _auctions[auctionId];
+        Item memory item = _auctions[auctionId].items[itemId];
+
+        auction.items[itemId] = auction.items[auction.items.length - 1];
+        auction.items.pop();
+
+        emit RemovedItem(auctionId, item.description);
     }
 
     function joinAuction(uint256 auctionId)
