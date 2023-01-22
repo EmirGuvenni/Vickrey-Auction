@@ -165,11 +165,11 @@ contract VickreyAuction is Context {
         require(bytes(name).length <= MAX_AUCTION_NAME_LEN, "Name is too long");
 
         // solhint-disable-next-line not-rely-on-time
-        require(startsAt > block.timestamp, "Start time must be in the future");
+        require(startsAt >= block.timestamp, "Invalid start time");
 
         // solhint-disable-next-line not-rely-on-time
         // solhint-disable-next-line reason-string
-        require(endsAt > startsAt, "End time must be after start time");
+        require(endsAt > startsAt, "Invalid end time");
 
         require(msg.value >= auctionFee, "Insufficient auction fee");
 
