@@ -148,17 +148,12 @@ contract VickreyAuction is Context {
             uint256 startsAt,
             uint256 endsAt,
             bool isConcluded,
-            string[] memory
+            Item[] memory items
         )
     {
         Auction storage auction = _auctions[auctionId];
-        string[] memory items;
 
-        for (uint256 i = 0; i < auction.items.length; i++) {
-            items[i] = auction.items[i].description;
-        }
-
-        return (auction.name, auction.creator, auction.startsAt, auction.endsAt, auction.isConcluded, items);
+        return (auction.name, auction.creator, auction.startsAt, auction.endsAt, auction.isConcluded, auction.items);
     }
 
     function createAuction(
