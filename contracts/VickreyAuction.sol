@@ -61,7 +61,6 @@ contract VickreyAuction is Context {
 
     // events
     /**
-     * @dev The name of the auction can be changed before the auction starts.
      * @param auctionId The id of the auction
      * @param creator The address of the auction creator
      * @param startsAt The start time of the auction
@@ -77,26 +76,21 @@ contract VickreyAuction is Context {
 
     /**
      * @param auctionId The id of the auction
-     * @param oldName The old name of the item
-     * @param newName The new name of the item
-     */
-    event AuctionNameChanged(uint256 indexed auctionId, string oldName, string newName);
-
-    /**
-     * @param auctionId The id of the auction
      * @param creator The address of the auction creator
      */
     event AuctionConcluded(uint256 indexed auctionId, address indexed creator);
 
-    // errors
     /**
-     * @notice This error is triggered when the auction name is in an invalid range.
-     * @dev minLength equals to MIN_AUCTION_NAME_LEN and maxLength equals to MAX_AUCTION_NAME_LEN.
-     * @param reason The reason for the error
-     * @param minLength Minimum accepted length
-     * @param maxLength Maximum accepted length
+     * @param auctionId The id of the auction
+     * @param item The description of the item
      */
-    error NameLengthError(string reason, uint8 minLength, uint8 maxLength);
+    event AddedItem(uint256 indexed auctionId, string item);
+
+    /**
+     * @param auctionId The id of the auction
+     * @param item The description of the remove item
+     */
+    event RemovedItem(uint256 indexed auctionId, string item);
 
     // modifiers
     modifier onlyOwner() {
