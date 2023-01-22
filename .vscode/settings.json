@@ -60,5 +60,8 @@
       }
     ]
   },
-  "hardhat.telemetry": false
+  "hardhat.telemetry": false,
+  "cSpell.words": [
+    "Miata"
+  ]
 }
