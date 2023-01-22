@@ -175,7 +175,7 @@ contract VickreyAuction is Context {
         // solhint-disable-next-line reason-string
         require(endsAt > startsAt, "End time must be after start time");
 
-        require(msg.value >= auctionFee, "Insufficient fee");
+        require(msg.value >= auctionFee, "Insufficient auction fee");
 
         uint256 auctionId = _auctionCounter.current();
         _auctionCounter.increment();
@@ -211,7 +211,7 @@ contract VickreyAuction is Context {
     }
 
     function joinAuction(uint256 auctionId) external payable mustBeNotStarted(auctionId) mustBeNotEnded(auctionId) {
-        require(msg.value >= entranceFee, "Insufficient fee");
+        require(msg.value >= entranceFee, "Insufficient participation fee");
 
         Auction storage auction = _auctions[auctionId];
         address sender = _msgSender();
