@@ -108,6 +108,12 @@ contract VickreyAuction is Context {
         _;
     }
 
+    modifier validAuctionId(uint256 auctionId) {
+        Auction storage auction = _auctions[auctionId];
+        require(auction.creator != address(0), "Invalid auction id");
+        _;
+    }
+
     modifier mustBeStarted(uint256 auctionId) {
         // solhint-disable-next-line not-rely-on-time
         require(_auctions[auctionId].startsAt <= block.timestamp, "Auction hasn't started yet");
@@ -135,6 +141,7 @@ contract VickreyAuction is Context {
     function getAuction(uint256 auctionId)
         public
         view
+        validAuctionId(auctionId)
         returns (
             string memory name,
             address creator,
@@ -186,6 +193,7 @@ contract VickreyAuction is Context {
 
     function addItem(uint256 auctionId, string memory description)
         external
+        validAuctionId(auctionId)
         onlyCreator(auctionId)
         mustBeNotStarted(auctionId)
         mustBeNotEnded(auctionId)
@@ -197,6 +205,7 @@ contract VickreyAuction is Context {
 
     function removeItem(uint256 auctionId, uint256 itemId)
         external
+        validAuctionId(auctionId)
         onlyCreator(auctionId)
         mustBeNotStarted(auctionId)
         mustBeNotEnded(auctionId)
@@ -204,7 +213,13 @@ contract VickreyAuction is Context {
         delete _auctions[auctionId].items[itemId];
     }
 
-    function joinAuction(uint256 auctionId) external payable mustBeNotStarted(auctionId) mustBeNotEnded(auctionId) {
+    function joinAuction(uint256 auctionId)
+        external
+        payable
+        validAuctionId(auctionId)
+        mustBeNotStarted(auctionId)
+        mustBeNotEnded(auctionId)
+    {
         require(msg.value >= entranceFee, "Insufficient participation fee");
 
         Auction storage auction = _auctions[auctionId];
@@ -218,6 +233,7 @@ contract VickreyAuction is Context {
     function placeBid(uint256 auctionId, uint256 itemId)
         external
         payable
+        validAuctionId(auctionId)
         onlyParticipant
         mustBeStarted(auctionId)
         mustBeNotEnded(auctionId)
@@ -232,7 +248,7 @@ contract VickreyAuction is Context {
         bid.itemId = itemId;
     }
 
-    function concludeAuction(uint256 auctionId) external onlyOwner mustBeEnded(auctionId) {
+    function concludeAuction(uint256 auctionId) external validAuctionId(auctionId) onlyOwner mustBeEnded(auctionId) {
         Auction storage auction = _auctions[auctionId];
         uint256 amountToBePaidToCreator = 0;
 
@@ -266,7 +282,7 @@ contract VickreyAuction is Context {
         auction.isConcluded = true;
     }
 
-    function withdrawLeftovers(uint256 auctionId) external payable onlyParticipant {
+    function withdrawLeftovers(uint256 auctionId) external payable validAuctionId(auctionId) onlyParticipant {
         address payable sender = payable(_msgSender());
         Auction storage auction = _auctions[auctionId];
         Participant storage participant = auction.participants[sender];
