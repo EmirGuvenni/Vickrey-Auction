@@ -615,7 +615,6 @@ describe('VickreyAuction', () => {
       const endsAt = Date.now() + 1000;
 
       const auctionFee = await vickreyAuction.auctionFee();
-      const entranceFee = await vickreyAuction.entranceFee();
 
       await vickreyAuction
         .connect(owner)
