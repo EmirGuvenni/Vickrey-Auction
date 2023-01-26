@@ -197,8 +197,6 @@ contract VickreyAuction is Context {
 
         auction.items.push();
         auction.items[auction.items.length - 1].description = description;
-        auction.items[auction.items.length - 1].bids.push();
-        auction.items[auction.items.length - 1].bids[0].from = auction.creator;
 
         emit AddedItem(auctionId, description);
     }
