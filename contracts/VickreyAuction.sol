@@ -244,7 +244,7 @@ contract VickreyAuction is Context {
         mustBeStarted(auctionId)
         mustBeNotEnded(auctionId)
     {
-        require(msg.value > 0, "Insufficent bid amount");
+        require(msg.value > 0, "Insufficient bid amount");
 
         address bidder = _msgSender();
         Auction storage auction = _auctions[auctionId];
