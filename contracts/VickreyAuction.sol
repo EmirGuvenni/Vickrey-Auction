@@ -297,6 +297,7 @@ contract VickreyAuction is Context {
         Participant storage participant = auction.participants[sender];
         uint256 amount = 0;
 
+        require(auction.isConcluded, "Auction not concluded");
         require(!participant.hasWithdrawn, "Already withdrawn");
 
         for (uint256 i = 0; i < auction.items.length; i++) {
