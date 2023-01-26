@@ -385,6 +385,112 @@ describe('VickreyAuction', () => {
         .to.emit(vickreyAuction, 'NewParticipant')
         .withArgs(0, participant.address);
     });
+
+    it('should not be able to join non-existent auction', async () => {
+      const participant = addresses[0];
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await expect(
+        vickreyAuction.connect(participant).joinAuction(0, {
+          value: entranceFee,
+        })
+      ).to.be.revertedWith('Invalid auction id');
+    });
+
+    it('should not be able to join auction that has already started', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      setTimeout(async () => {
+        await expect(
+          vickreyAuction.connect(participant).joinAuction(0, {
+            value: entranceFee,
+          })
+        ).to.be.revertedWith('Auction has already started');
+      }, 1000);
+    });
+
+    it('should not be able to join auction that has already ended', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      setTimeout(async () => {
+        await expect(
+          vickreyAuction.connect(participant).joinAuction(0, {
+            value: entranceFee,
+          })
+        ).to.be.revertedWith('Auction has already ended');
+      }, 2000);
+    });
+
+    it('should not be able to join auction with insufficient funds', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await expect(
+        vickreyAuction.connect(participant).joinAuction(0, {
+          value: 0,
+        })
+      ).to.be.revertedWith('Insufficient participation fee');
+    });
+
+    it('should not be able to join auction twice', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      await expect(
+        vickreyAuction.connect(participant).joinAuction(0, {
+          value: entranceFee,
+        })
+      ).to.be.revertedWith('Already joined');
+    });
   });
 
   describe('bidding in an auction', () => {});
