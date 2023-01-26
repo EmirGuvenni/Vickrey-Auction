@@ -16,8 +16,6 @@ contract VickreyAuction is Context {
     using Address for address;
     using Counters for Counters.Counter;
 
-    address private _owner;
-
     Counters.Counter private _auctionCounter;
 
     uint256 public auctionFee = 0.01 ether;
