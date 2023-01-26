@@ -4,6 +4,8 @@ A Vickrey auction or sealed-bid second-price auction is a type of sealed-bid auc
 
 # About this project
 
+<!-- cSpell:ignore Emre, Tepe -->
+
 I made this project to show people that i can do stuff with Solidity. All issues and PRs are welcome. Lastly, a thank you to [Emre Tepe](https://github.com/emretepedev) for the boilerplate.
 
 # Coverage Report
