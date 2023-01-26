@@ -265,6 +265,100 @@ describe('VickreyAuction', () => {
       const auction = await vickreyAuction.getAuction(0);
       expect(auction.items.length).to.equal(items.length - 1);
     });
+
+    it('should not be able to remove items from non-existent auction', async () => {
+      await expect(
+        vickreyAuction.connect(owner).removeItem(0, 0)
+      ).to.be.revertedWith('Invalid auction id');
+    });
+
+    it('should not be able to remove items from auction that has already started', async () => {
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+
+      expect(
+        await vickreyAuction
+          .connect(owner)
+          .createAuction(auctionName, startsAt, endsAt, { value: auctionFee })
+      )
+        .to.emit(vickreyAuction, 'AuctionCreated')
+        .withArgs(0, owner.address);
+
+      const items = ['BMW Z4', 'Honda S2000', 'Mazda Miata'];
+
+      for (const item of items) {
+        await expect(vickreyAuction.connect(owner).addItem(0, item))
+          .to.emit(vickreyAuction, 'AddedItem')
+          .withArgs(0, item);
+      }
+
+      setTimeout(async () => {
+        await expect(
+          vickreyAuction.connect(owner).removeItem(0, 0)
+        ).to.be.revertedWith('Auction has already started');
+      }, 1000);
+    });
+
+    it('should not be able to remove items from auction that has already ended', async () => {
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+
+      expect(
+        await vickreyAuction
+          .connect(owner)
+          .createAuction(auctionName, startsAt, endsAt, { value: auctionFee })
+      )
+        .to.emit(vickreyAuction, 'AuctionCreated')
+        .withArgs(0, owner.address);
+
+      const items = ['BMW Z4', 'Honda S2000', 'Mazda Miata'];
+
+      for (const item of items) {
+        await expect(vickreyAuction.connect(owner).addItem(0, item))
+          .to.emit(vickreyAuction, 'AddedItem')
+          .withArgs(0, item);
+      }
+
+      setTimeout(async () => {
+        await expect(
+          vickreyAuction.connect(owner).removeItem(0, 0)
+        ).to.be.revertedWith('Auction has already ended');
+      }, 2000);
+    });
+
+    it('should not be able to remove items by non-owner', async () => {
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+
+      expect(
+        await vickreyAuction
+          .connect(owner)
+          .createAuction(auctionName, startsAt, endsAt, { value: auctionFee })
+      )
+        .to.emit(vickreyAuction, 'AuctionCreated')
+        .withArgs(0, owner.address);
+
+      const items = ['BMW Z4', 'Honda S2000', 'Mazda Miata'];
+
+      for (const item of items) {
+        await expect(vickreyAuction.connect(owner).addItem(0, item))
+          .to.emit(vickreyAuction, 'AddedItem')
+          .withArgs(0, item);
+      }
+
+      await expect(
+        vickreyAuction.connect(addresses[0]).removeItem(0, 0)
+      ).to.be.revertedWith('Caller is not the creator');
+    });
   });
 
   describe('joining an auction', () => {
