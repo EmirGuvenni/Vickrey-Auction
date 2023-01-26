@@ -18,8 +18,8 @@ contract VickreyAuction is Context {
 
     Counters.Counter private _auctionCounter;
 
-    uint256 public auctionFee = 0.01 ether;
-    uint256 public entranceFee = 0.001 ether;
+    uint256 public auctionFee = 1000000000;
+    uint256 public entranceFee = 100000000;
 
     uint8 public constant MIN_AUCTION_NAME_LEN = 3;
     uint8 public constant MAX_AUCTION_NAME_LEN = 32;
