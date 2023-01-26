@@ -688,5 +688,73 @@ describe('VickreyAuction', () => {
         ).to.be.revertedWith('Auction has not ended yet');
       }, 1000);
     });
+
+    it('should not be able to conclude an auction that has already been concluded', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        await vickreyAuction.connect(participant).placeBid(0, 0, {
+          value: 1000,
+        });
+
+        await vickreyAuction.connect(owner).concludeAuction(0);
+
+        await expect(
+          vickreyAuction.connect(owner).concludeAuction(0)
+        ).to.be.revertedWith('Auction has already been concluded');
+      }, 2000);
+    });
+
+    it('should not be able to conclude an auction that does not exist', async () => {
+      await expect(
+        vickreyAuction.connect(owner).concludeAuction(0)
+      ).to.be.revertedWith('Invalid auction id');
+    });
+
+    it('should not be able to conclude an auction that they are not the owner of', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        await vickreyAuction.connect(participant).placeBid(0, 0, {
+          value: 1000,
+        });
+
+        await expect(
+          vickreyAuction.connect(participant).concludeAuction(0)
+        ).to.be.revertedWith('Caller is not the owner');
+      }, 2000);
+    });
   });
 });
