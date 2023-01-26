@@ -493,5 +493,201 @@ describe('VickreyAuction', () => {
     });
   });
 
-  describe('bidding in an auction', () => {});
+  describe('bidding in an auction', () => {
+    it('participants should be able to bid', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        expect(
+          await vickreyAuction
+            .connect(participant)
+            .placeBid(0, 0, { value: 1000 })
+        )
+          .to.emit(vickreyAuction, 'Bid')
+          .withArgs(0, participant.address, 0, 1000);
+      }, 200);
+    });
+
+    it('should not be able to bid in non-existent auction', async () => {
+      const participant = addresses[0];
+
+      await expect(
+        vickreyAuction.connect(participant).placeBid(0, 0, { value: 1000 })
+      ).to.be.revertedWith('Invalid auction id');
+    });
+
+    it("should not be able to bid in auction that hasn't started yet", async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      await expect(
+        vickreyAuction.connect(participant).placeBid(0, 0, { value: 1000 })
+      ).to.be.revertedWith("Auction hasn't started yet");
+    });
+
+    it('should not be able to bid in auction that has ended', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        await expect(
+          vickreyAuction.connect(participant).placeBid(0, 0, { value: 1000 })
+        ).to.be.revertedWith('Auction has already ended');
+      }, 2000);
+    });
+
+    it('should not be able to bid with insufficient funds', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        await expect(
+          vickreyAuction.connect(participant).placeBid(0, 0, { value: 0 })
+        ).to.be.revertedWith('Insufficient bid amount');
+      }, 200);
+    });
+
+    it('should not be able to bid in auction that they are not participating in', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await expect(
+        vickreyAuction.connect(participant).placeBid(0, 0, { value: 1000 })
+      ).to.be.revertedWith('Caller is not a participant');
+    });
+  });
+
+  describe('concluding an auction', () => {
+    it('should be able to conclude an auction', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        await vickreyAuction.connect(participant).placeBid(0, 0, {
+          value: 1000,
+        });
+
+        expect(await vickreyAuction.connect(owner).concludeAuction(0))
+          .to.emit(vickreyAuction, 'AuctionConcluded')
+          .withArgs(0, 1000);
+      }, 2000);
+    });
+
+    it('should not be able to conclude an auction that has not ended yet', async () => {
+      const participant = addresses[0];
+      const auctionName = 'My Auction';
+      const startsAt = Date.now();
+      const endsAt = Date.now() + 1000;
+
+      const auctionFee = await vickreyAuction.auctionFee();
+      const entranceFee = await vickreyAuction.entranceFee();
+
+      await vickreyAuction
+        .connect(owner)
+        .createAuction(auctionName, startsAt, endsAt, {
+          value: auctionFee,
+        });
+
+      await vickreyAuction.connect(participant).joinAuction(0, {
+        value: entranceFee,
+      });
+
+      setTimeout(async () => {
+        await vickreyAuction.connect(participant).placeBid(0, 0, {
+          value: 1000,
+        });
+
+        await expect(
+          vickreyAuction.connect(owner).concludeAuction(0)
+        ).to.be.revertedWith('Auction has not ended yet');
+      }, 1000);
+    });
+  });
 });
