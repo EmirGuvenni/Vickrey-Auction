@@ -254,7 +254,12 @@ contract VickreyAuction is Context {
         bid.itemId = itemId;
     }
 
-    function concludeAuction(uint256 auctionId) external validAuctionId(auctionId) onlyOwner mustBeEnded(auctionId) {
+    function concludeAuction(uint256 auctionId)
+        external
+        validAuctionId(auctionId)
+        onlyCreator(auctionId)
+        mustBeEnded(auctionId)
+    {
         Auction storage auction = _auctions[auctionId];
         uint256 amountToBePaidToCreator = 0;
 
@@ -270,12 +275,14 @@ contract VickreyAuction is Context {
 
             // Find the winner
             // Starts at index 1 since 0 is already assigned to winnerBid
-            for (uint256 j = 1; j < item.bids.length; j++) {
-                Bid storage bid = item.bids[j];
+            if (item.bids.length > 1) {
+                for (uint256 j = 1; j < item.bids.length; j++) {
+                    Bid storage bid = item.bids[j];
 
-                if (bid.amount > winnerBid.amount) {
-                    bidAmount = winnerBid.amount;
-                    winnerBid = bid;
+                    if (bid.amount > winnerBid.amount) {
+                        bidAmount = winnerBid.amount;
+                        winnerBid = bid;
+                    }
                 }
             }
 
