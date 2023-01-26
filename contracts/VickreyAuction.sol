@@ -244,14 +244,15 @@ contract VickreyAuction is Context {
     {
         require(msg.value > 0, "Insufficient bid amount");
 
-        address bidder = _msgSender();
         Auction storage auction = _auctions[auctionId];
 
-        Bid storage bid = auction.items[itemId].bids[auction.items[itemId].bids.length];
+        require(itemId < auction.items.length, "Invalid item id");
 
-        bid.from = bidder;
-        bid.amount = msg.value;
-        bid.itemId = itemId;
+        address bidder = _msgSender();
+
+        auction.items[itemId].bids.push(
+            Bid({ from: bidder, itemId: itemId, amount: msg.value, amountToBePaid: 0, isWinner: false })
+        );
     }
 
     function concludeAuction(uint256 auctionId)
