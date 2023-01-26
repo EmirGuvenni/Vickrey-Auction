@@ -190,8 +190,8 @@ contract VickreyAuction is Context {
         external
         validAuctionId(auctionId)
         onlyCreator(auctionId)
-        mustBeNotStarted(auctionId)
         mustBeNotEnded(auctionId)
+        mustBeNotStarted(auctionId)
     {
         Auction storage auction = _auctions[auctionId];
 
@@ -207,8 +207,8 @@ contract VickreyAuction is Context {
         external
         validAuctionId(auctionId)
         onlyCreator(auctionId)
-        mustBeNotStarted(auctionId)
         mustBeNotEnded(auctionId)
+        mustBeNotStarted(auctionId)
     {
         Auction storage auction = _auctions[auctionId];
         Item memory item = _auctions[auctionId].items[itemId];
@@ -223,8 +223,8 @@ contract VickreyAuction is Context {
         external
         payable
         validAuctionId(auctionId)
-        mustBeNotStarted(auctionId)
         mustBeNotEnded(auctionId)
+        mustBeNotStarted(auctionId)
     {
         require(msg.value >= entranceFee, "Insufficient participation fee");
 
