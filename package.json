@@ -71,6 +71,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "cspell": "^6.4.1",
+    "delay": "^5.0.0",
     "dotenv": "^16.0.1",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
