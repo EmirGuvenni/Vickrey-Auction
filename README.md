@@ -1,3 +1,11 @@
+# Vickrey Auction
+
+A Vickrey auction or sealed-bid second-price auction is a type of sealed-bid auction. Bidders submit written bids without knowing the bid of the other people in the auction. The highest bidder wins but the price paid is the second-highest bid. [Wikipedia](https://en.wikipedia.org/wiki/Vickrey_auction)
+
+# About this project
+
+I made this project to show people that i can do stuff with Solidity. All issues and PRs are welcome. Lastly, a thank you to [Emre Tepe](https://github.com/emretepedev) for the boilerplate.
+
 # Coverage Report
 
 | Statements                                                                               | Functions                                                                              | Lines                                                                          |
@@ -111,9 +119,3 @@ yarn run generate:all-metadata
 ```shell
 yarn run share    # share project folder with remix ide
 ```
-
-# TODO
-
-- Increase diversity in the Workshop Contract
-- Add Workshop Contract tests
-- Add TSLint as a TypeScript linter
