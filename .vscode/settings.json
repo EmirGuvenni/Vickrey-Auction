@@ -60,5 +60,5 @@
       }
     ]
   },
-  "hardhat.telemetry": false,
+  "hardhat.telemetry": false
 }
