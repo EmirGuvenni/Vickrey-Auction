@@ -644,6 +644,8 @@ describe('VickreyAuction', () => {
           value: auctionFee,
         });
 
+      const initialOwnerBalance = await owner.getBalance();
+
       await vickreyAuction.connect(participant).joinAuction(0, {
         value: entranceFee,
       });
@@ -656,6 +658,8 @@ describe('VickreyAuction', () => {
         expect(await vickreyAuction.connect(owner).concludeAuction(0))
           .to.emit(vickreyAuction, 'AuctionConcluded')
           .withArgs(0, 1000);
+
+        expect(await owner.getBalance()).to.be.gt(initialOwnerBalance);
       }, 2000);
     });
 
