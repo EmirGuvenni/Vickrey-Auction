@@ -93,11 +93,6 @@ contract VickreyAuction is Context {
     event RemovedItem(uint256 indexed auctionId, string item);
 
     // modifiers
-    modifier onlyOwner() {
-        require(_msgSender() == _owner, "Caller is not the owner");
-        _;
-    }
-
     modifier onlyCreator(uint256 auctionId) {
         require(_msgSender() == _auctions[auctionId].creator, "Caller is not the creator");
         _;
