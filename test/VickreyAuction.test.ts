@@ -213,7 +213,7 @@ describe('VickreyAuction', () => {
       }, 2000);
     });
 
-    it('should bot be able to add items by non-owner', async () => {
+    it('should not be able to add items by non-owner', async () => {
       const auctionName = 'My Auction';
       const startsAt = Date.now();
       const endsAt = Date.now() + 1000;
